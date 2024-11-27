@@ -32,10 +32,27 @@ function plot(data, normFactor = 128) {
     ctx.stroke();
 }
 
+function bar(data, normFactor = 255) {
+    ctx.fillStyle = 'red';
+
+    let x = 0;
+    for (let i = 0; i < data.length; i++) {
+        const gapSize = 2;
+        const sizeOfAllGaps = (data.length - 1) * gapSize;
+        const barWidth = (canvas.width - sizeOfAllGaps) / data.length;
+        const barHeight = canvas.height * (data[i] / normFactor) / 2;
+
+        ctx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
+
+        x += barWidth + gapSize;
+    }
+}
+
 function frame() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     plot(audio.getTimeData());
+    bar(audio.getFreqData());
 
     requestAnimationFrame(frame);
 }
