@@ -10,11 +10,13 @@ window.addEventListener('resize', () => {
 const ctx = canvas.getContext('2d');
 
 function plot(data, normFactor = 128) {
-    ctx.lineWidth = 10;
+    ctx.lineWidth = 3;
     const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-    gradient.addColorStop(0, '#ff7c00');
-    gradient.addColorStop(1, '#ffcc00');
+    gradient.addColorStop(0, '#00ff00');
+    gradient.addColorStop(1, '#004400');
     ctx.strokeStyle = gradient;
+    ctx.shadowColor = '#00ff00';
+    ctx.shadowBlur = 10;
 
     ctx.beginPath();
     let x = 0;
@@ -33,7 +35,12 @@ function plot(data, normFactor = 128) {
 }
 
 function bar(data, normFactor = 255) {
-    ctx.fillStyle = 'red';
+    const gradient = ctx.createLinearGradient(0, 0, canvas.width, 0);
+    gradient.addColorStop(0, '#009900');
+    gradient.addColorStop(1, '#004400');
+    ctx.fillStyle = gradient;
+    ctx.shadowColor = '#009900';
+    ctx.shadowBlur = 15;
 
     let x = 0;
     for (let i = 0; i < data.length; i++) {
@@ -48,8 +55,32 @@ function bar(data, normFactor = 255) {
     }
 }
 
+const particles = [];
+for (let i = 0; i < 100; i++) {
+    particles.push({
+        x: canvas.width * Math.random(),
+        y: canvas.height * Math.random(),
+        size: Math.random() * 2 + 1,
+        speed: Math.random() * 0.5,
+        color: `rgba(0, 255, 0, ${Math.random()})`
+    });
+}
+
 function frame() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = 'black';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    particles.forEach(particle => {
+        ctx.beginPath();
+        ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+        ctx.fillStyle = particle.color;
+        ctx.fill();
+
+        particle.y -= particle.speed;
+        if (particle.y < 0) {
+            particle.y = canvas.height;
+        }
+    });
 
     plot(audio.getTimeData());
     bar(audio.getFreqData());
